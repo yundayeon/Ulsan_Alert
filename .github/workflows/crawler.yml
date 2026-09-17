@@ -1,0 +1,56 @@
+name: 울산대 새 공지 확인
+
+on:
+  schedule:
+    # 매시간 7분, 37분에 실행
+    - cron: "7,37 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ulsan-notice-crawler
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 저장소 가져오기
+        uses: actions/checkout@v4
+
+      - name: Python 준비
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 패키지와 브라우저 설치
+        run: |
+          python -m pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: 공지 확인 및 Discord 전송
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python -u crawler.py
+
+      # 일부 알림 전송 후 오류가 나도 저장된 ID를 보존
+      - name: 확인한 게시글 기록 저장
+        if: always()
+        run: |
+          if [ ! -f state.json ]; then
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -- state.json
+
+          if ! git diff --cached --quiet; then
+            git commit -m "Update notice state"
+            git push
+          fi
