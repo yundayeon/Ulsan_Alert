@@ -32,12 +32,14 @@ def save_seen_ids(ids):
 
 
 def send_discord(post):
+    url = post.get("url") or NOTICE_URL
+
     message = (
         "📢 **울산대 SW중심대학사업단 새 공지**\n\n"
         f"**{post['title']}**\n"
         f"작성일: {post['date']}\n"
         f"ID: {post['id']}\n"
-        f"{post['url']}"
+        f"{url}"
     )
 
     response = requests.post(
@@ -230,8 +232,6 @@ def main():
                 f"URL을 찾지 못했습니다: "
                 f"{post['title']} (ID: {post['id']})"
             )
-
-            continue
 
         try:
             send_discord(post)

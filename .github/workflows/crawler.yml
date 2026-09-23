@@ -2,8 +2,9 @@ name: 울산대 새 공지 확인
 
 on:
   schedule:
-    # 매시간 정각, 30분에 실행
-    - cron: "0,30 * * * *"
+    - cron: "7,37 * * * *"
+      timezone: "Asia/Seoul"
+
   workflow_dispatch:
 
 permissions:
@@ -37,7 +38,6 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: python -u crawler.py
 
-      # 일부 알림 전송 후 오류가 나도 저장된 ID를 보존
       - name: 확인한 게시글 기록 저장
         if: always()
         run: |
