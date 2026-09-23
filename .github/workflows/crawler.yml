@@ -2,7 +2,7 @@ name: 울산대 새 공지 확인
 
 on:
   schedule:
-    # 매시간 7분, 37분에 실행
+    # 매시간 정각, 30분에 실행
     - cron: "0,30 * * * *"
   workflow_dispatch:
 
